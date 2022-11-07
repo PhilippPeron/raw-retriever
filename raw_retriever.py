@@ -1,8 +1,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFileDialog
 from pathlib import Path
 import re
+import shutil
 
 RAW_DIRECTORY = ""
 RAW_FILE_ENDING = "NEF"
@@ -18,20 +20,54 @@ class Label(QLabel):
                  border: 3px dashed #aaa
              }
          """)
+        RAW_DIRECTORY = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        _ = raw_directory_to_path()
+        print(f"Selected RAW directory: '{RAW_DIRECTORY}'")
+        print("-----------------------")
+
+
+def raw_directory_to_path():
+    raw_dir_path = Path(RAW_DIRECTORY)
+    if not RAW_DIRECTORY or not raw_dir_path.exists():
+        print(f"Chosen directory: '{RAW_DIRECTORY}' does ont exist. Exit Program.")
+        exit()
+        sys.exit(app.exec_())
+    return raw_dir_path
 
 
 def handle_drop_files(file_list):
+    raw_dir_path = raw_directory_to_path()
     file_dict = files_to_dict(file_list)
-    copy_files(file_dict)
+    copy_files(file_dict, raw_dir_path)
 
 
-def copy_files(file_dict, dir_path):
-    for _, file_path in file_dict.items():
-        # TODO: Check if file exists in RAW directory or first level subdirectory
-        # TODO: Copy file from RAW directory to original directory
+def copy_files(file_dict, raw_dir_path):
+    """Go through dropped files and copy RAW equivalent from RAW directory"""
+    for file_stem, file_path in file_dict.items():
+
+        try:
+            raw_file_path = get_raw_path(raw_dir_path, file_stem)
+        except FileNotFoundError:
+            print(f"! Could not find RAW version of {file_stem} in '{RAW_DIRECTORY}. Skipped file.'")
+            continue
+        dst_path = file_path.parent / raw_file_path.name
+        try:
+            shutil.copy(raw_file_path, dst_path)
+        except Exception:  # TODO: Make exception type more precise
+            # TODO: Show message box if problem and skip file
+            continue
         # TODO: Make box flash green if successful
-        # TODO: Show message box if problem and skip file
-        pass
+
+
+def get_raw_path(raw_dir_path, file_stem):
+    """Find raw file in RAW directory and return its path"""
+    # TODO: Check if file exists in RAW directory or first level subdirectory, raise FileNotFound error
+    return raw_file_path
+
+
+def get_dst_path(file_path, raw_file_path):
+    dst_path = file_path.parent / raw_file_path.name
+    return dst_path
 
 
 def files_to_dict(file_list):
@@ -50,6 +86,7 @@ def files_to_dict(file_list):
 
 
 def check_regex(file_name):
+    """Check if file name has jpg ending"""
     regex = r"(?i)\w*\.(\bjpg\b|\bjpeg\b)"
     match = re.compile(regex).match(file_name)
     return bool(match)
