@@ -15,4 +15,5 @@ RAW Retriever tries to find the RAW-counterparts in the selected directory or a 
 
 ## EXE generation:
 The executable 'RAW Retriever.exe' is generated from 'raw_retriever.py' using pyinstaller. \
-The cmd command is: 'pyinstaller .\raw_retriever.py --onefile'
+The cmd command is: 'pyinstaller .\raw_retriever.py --onefile' \
+You can install pyinstaller with pip: 'pip install pyinstaller'
