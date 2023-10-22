@@ -4,7 +4,7 @@ RAW Retriever finds NEF-RAW images in a directory and copies them to the JPG loc
 
 My personal photography workflow consists of downloading the JPGs and sorting them.
 Afterwards I get the RAW images for my best images from the camera. That way I don't have to copy all the RAWs from the beginning.
-This is better for my SSD and also faster when sorting images.\
+This is faster for me when sorting images.\
 The application helps me in copying the RAW images to the JPG directory.
 
 ## Usage:
